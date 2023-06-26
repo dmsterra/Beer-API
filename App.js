@@ -22,9 +22,6 @@ const Cerveja = () => {
           brand TEXT,
           name TEXT,
           style TEXT,
-          yeast TEXT,
-          malts TEXT,
-          alcohol TEXT
         )
         `
       );
@@ -40,8 +37,8 @@ const Cerveja = () => {
       db.transaction(tx => {
         if (tx.executeSql) {
           tx.executeSql(
-            'INSERT INTO beers (brand, name, style, yeast, malts, alcohol) VALUES (?, ?, ?, ?, ?, ?)',
-            [data.brand, data.name, data.style, data.yeast, data.malts, data.alcohol],
+            'INSERT INTO beers (brand, name, style, yeast, malts, alcohol) VALUES (?, ?, ?)',
+            [data.brand, data.name, data.style],
             (_, resultSet) => {
               if (resultSet.rowsAffected > 0) {
                 console.log('Cerveja inserida!');
@@ -71,9 +68,6 @@ const Cerveja = () => {
             brand: row.brand,
             name: row.name,
             style: row.style,
-            yeast: row.yeast,
-            malts: row.malts,
-            alcohol: row.alcohol,
           }));
           setSearchHistory(entries);
         });
@@ -108,9 +102,6 @@ const Cerveja = () => {
           <Text style={styles.beerDetailText}>Brand: {beerData.brand}</Text>
           <Text style={styles.beerDetailText}>Name: {beerData.name}</Text>
           <Text style={styles.beerDetailText}>Style: {beerData.style}</Text>
-          <Text style={styles.beerDetailText}>Yeast: {beerData.yeast}</Text>
-          <Text style={styles.beerDetailText}>Malts: {beerData.malts}</Text>
-          <Text style={styles.beerDetailText}>Alcohol: {beerData.alcohol}</Text>
         </View>
       )}
 
