@@ -97,7 +97,7 @@ const Cerveja = () => {
 
   return (
     <View style={styles.container}>
-      <Button title="Buscar Cerveja" onPress={fetchRandomBeer} color="#FF5722" />
+      <Button title="Buscar Cerveja" onPress={fetchRandomBeer} color='#DAA520' />
 
       {beerData && (
         <View style={styles.beerDetails}>
@@ -108,7 +108,7 @@ const Cerveja = () => {
       )}
 
       <Text style={styles.searchHistoryTitle}>Histórico de pedidos:</Text>
-      <Button title="Limpar Histórico" onPress={clearSearchHistory} color="#FF5722" />
+      <Button title="Limpar Histórico" onPress={clearSearchHistory} color="#DAA520" />
       <FlatList
         data={searchHistory}
         renderItem={renderSearchItem}
