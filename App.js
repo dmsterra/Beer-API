@@ -13,67 +13,69 @@ const Cerveja = () => {
     loadSearchHistory();
   }, []);
 
-  const createBeerTable = () => {
+  const createBeerTable = async () => {
+    // console.log('4');
     db.transaction(tx => {
+      // console.log('5');
       tx.executeSql(
         `
         CREATE TABLE IF NOT EXISTS beers (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           brand TEXT,
           name TEXT,
-          style TEXT,
+          style TEXT
         )
         `
       );
+      // console.log('51');
     });
+    // console.log('6');
   };
 
   const fetchRandomBeer = async () => {
+    // console.log('7');
     try {
+      // console.log('11');
       const response = await fetch('https://random-data-api.com/api/beer/random_beer');
+      // console.log('10');
       const data = await response.json();
+      // console.log('8');
       setBeerData(data);
+      // console.log('9');
 
       db.transaction(tx => {
-        if (tx.executeSql) {
-          tx.executeSql(
-            'INSERT INTO beers (brand, name, style, yeast, malts, alcohol) VALUES (?, ?, ?)',
-            [data.brand, data.name, data.style],
-            (_, resultSet) => {
-              if (resultSet.rowsAffected > 0) {
-                console.log('Cerveja inserida!');
-              }
-            },
-            (_, error) => {
-              console.error('Erro ao inserir!', error);
+        tx.executeSql(
+          'INSERT INTO beers (brand, name, style) VALUES (?, ?, ?)',
+          [data.brand, data.name, data.style],
+          (_, resultSet) => {
+            if (resultSet.rowsAffected > 0) {
+              console.log('Cerveja inserida!');
+              loadSearchHistory();
             }
-          );
-        } else {
-          console.warn('executeSql não está disponível');
-        }
+          },
+          (_, error) => {
+            console.error('Erro ao inserir!', error);
+          }
+        );
       });
-
-      loadSearchHistory();
     } catch (error) {
       console.error('Erro ao carregar:', error);
     }
   };
 
-  const loadSearchHistory = () => {
+  const loadSearchHistory = async () => {
     db.transaction(tx => {
-      if (tx.executeSql) {
-        tx.executeSql('SELECT * FROM beers', [], (_, resultSet) => {
-          const entries = resultSet.rows.raw().map(row => ({
-            id: row.id,
-            brand: row.brand,
-            name: row.name,
-            style: row.style,
-          }));
-          setSearchHistory(entries);
-        });
-      } else {
-        console.warn('executeSql não está disponível');
-      }
+      tx.executeSql('SELECT * FROM beers', [], (_, resultSet) => {
+        // console.log(resultSet.rows._array);
+        const entries = resultSet.rows._array.map(row => ({
+          id: row.id,
+          brand: row.brand,
+          name: row.name,
+          style: row.style,
+        }));
+        // console.log(entries);
+        setSearchHistory(entries);
+      });
     });
   };
 
