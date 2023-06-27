@@ -13,10 +13,8 @@ const Cerveja = () => {
     loadSearchHistory();
   }, []);
 
-  const createBeerTable = async () => {
-    // console.log('4');
+  const createBeerTable = () => {
     db.transaction(tx => {
-      // console.log('5');
       tx.executeSql(
         `
         CREATE TABLE IF NOT EXISTS beers (
@@ -27,21 +25,14 @@ const Cerveja = () => {
         )
         `
       );
-      // console.log('51');
     });
-    // console.log('6');
   };
 
   const fetchRandomBeer = async () => {
-    // console.log('7');
     try {
-      // console.log('11');
       const response = await fetch('https://random-data-api.com/api/beer/random_beer');
-      // console.log('10');
       const data = await response.json();
-      // console.log('8');
       setBeerData(data);
-      // console.log('9');
 
       db.transaction(tx => {
         tx.executeSql(
@@ -63,17 +54,15 @@ const Cerveja = () => {
     }
   };
 
-  const loadSearchHistory = async () => {
+  const loadSearchHistory = () => {
     db.transaction(tx => {
       tx.executeSql('SELECT * FROM beers', [], (_, resultSet) => {
-        // console.log(resultSet.rows._array);
         const entries = resultSet.rows._array.map(row => ({
           id: row.id,
           brand: row.brand,
           name: row.name,
           style: row.style,
         }));
-        // console.log(entries);
         setSearchHistory(entries);
       });
     });
@@ -95,6 +84,17 @@ const Cerveja = () => {
 
   const renderSeparator = () => <View style={styles.separator} />;
 
+  const clearSearchHistory = () => {
+    db.transaction(tx => {
+      tx.executeSql('DROP TABLE IF EXISTS beers', [], () => {
+        console.log('Histórico de pedidos limpo!');
+        setSearchHistory([]);
+      }, (_, error) => {
+        console.error('Erro ao limpar o histórico de pedidos:', error);
+      });
+    });
+  };
+
   return (
     <View style={styles.container}>
       <Button title="Buscar Cerveja" onPress={fetchRandomBeer} color="#FF5722" />
@@ -108,6 +108,7 @@ const Cerveja = () => {
       )}
 
       <Text style={styles.searchHistoryTitle}>Histórico de pedidos:</Text>
+      <Button title="Limpar Histórico" onPress={clearSearchHistory} color="#FF5722" />
       <FlatList
         data={searchHistory}
         renderItem={renderSearchItem}
@@ -140,6 +141,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 20,
+    marginBottom: 20,
   },
   searchItem: {
     backgroundColor: '#FFF',
